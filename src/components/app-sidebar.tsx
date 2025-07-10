@@ -1,4 +1,7 @@
-import { Home, Inbox, PanelBottom, DollarSign } from "lucide-react"
+"use client"
+
+import type * as React from "react"
+import { Home, User, Car, Building, Shield, LogOut, User2 } from "lucide-react"
 
 import {
   Sidebar,
@@ -7,34 +10,73 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarRail,
 } from "~/components/ui/sidebar"
 
-// Menu items.
-const items = [
-  { title: "Home", url: "/", icon: Home },
-  { title: "Ucp", url: "/profile/ucp", icon: PanelBottom},
-    { title: "Store", url: "/store", icon: DollarSign },
-
+const menuItems = [
+  {
+    title: "Ucp",
+    icon: User2,
+    id: "ucp-profile",
+  },
+  {
+    title: "Karakter",
+    icon: User,
+    id: "karakter",
+  },
+  {
+    title: "Vehicles",
+    icon: Car,
+    id: "vehicles",
+  },
+  {
+    title: "Properties",
+    icon: Building,
+    id: "properties",
+  },
+  {
+    title: "Security",
+    icon: Shield,
+    id: "security",
+  }
 ]
 
-export function AppSidebar() {
+interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
+  activeSection: string
+  onSectionChange: (section: string) => void
+}
+
+export function AppSidebar({
+  activeSection,
+  onSectionChange,
+  ...props
+}: AppSidebarProps) {
   return (
-    <Sidebar>
+    <Sidebar variant="inset" {...props }>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>User Panel</SidebarGroupLabel>
+          {/* <SidebarGroupLabel className="text-sm px-3 font-medium">Character</SidebarGroupLabel> */}
+          <SidebarGroupContent className="px-2">
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-sm px-3 font-medium">Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
+              {menuItems.map((item) => (
+                <SidebarMenuItem key={item.id}>
+                  <SidebarMenuButton
+                    isActive={activeSection === item.id}
+                    onClick={() => onSectionChange(item.id)}
+                    className="h-10 text-sm font-medium"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.title}</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
@@ -42,6 +84,18 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      <SidebarFooter className="p-3">
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton className="text-destructive hover:text-destructive hover:bg-destructive/10 h-10 font-medium">
+              <LogOut className="h-4 w-4" />
+              <span className="text-sm">Logout</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }
