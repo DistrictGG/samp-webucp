@@ -5,6 +5,7 @@ import { Geist } from "next/font/google";
 
 import { TRPCReactProvider } from "~/trpc/react";
 import { ThemeProvider } from "~/components/theme-provider";
+import { Toaster } from "~/components/ui/sonner"
 
 
 export const metadata: Metadata = {
@@ -27,6 +28,7 @@ export default function RootLayout({
           <TRPCReactProvider>
             <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
               {children}
+              <Toaster position="top-right"/>
             </ThemeProvider>
           </TRPCReactProvider>
       </body>
