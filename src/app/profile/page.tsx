@@ -1,14 +1,12 @@
-import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar"
-import { AppSidebar } from "~/components/app-sidebar";
-import { auth } from "~/server/auth";
-import { api, HydrateClient } from "~/trpc/server";
+import UCPProfile from "~/app/profile/components/ucp/profile";
+import { auth, signIn } from "~/server/auth";
 
 export default async function UcpPage() {
     const session = await auth();
-    const ucpDat = await api.ucp.playerucp({ uuid: session?.user?.id ?? "" });
+    if (!session) {
+        return signIn();
+    }
     return (
-        <HydrateClient>
-            s
-        </HydrateClient>
+        <UCPProfile session={session} />
     );
 }
