@@ -124,10 +124,21 @@ model Character {
     HaveHouse Int?            @default(0)
     House     Int?            @default(0) // if 0 = No House 
     InHouse   Int?            @default(0) // if 0 = Not in House, 1 = In House
+    status    String?         @db.VarChar(64) @default("offline")
     vehicle   Vehicles[]            
     playerskin skin_player[]
     inventory  Inventory[]
+    characterActivity CharacterActivity[]
     @@index([ucp])
+}
+
+model CharacterActivity {
+    id        Int       @id @default(autoincrement())
+    character Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+    characterId Int
+    activity  String     @db.VarChar(255)
+    timestamp DateTime   @default(now())
+    @@index([characterId])
 }
 
 model public_garage {
