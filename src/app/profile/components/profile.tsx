@@ -11,6 +11,7 @@ import type { Session } from "next-auth"
 
 //section
 import { UcpSection } from "~/app/profile/components/ucp/ucp"
+import { KarakterSection } from "~/app/profile/components/karakter/karakter"
 
 export default function UCPProfile({ session }: { session: Session }) {
   const { setTheme } = useTheme()
@@ -20,6 +21,8 @@ export default function UCPProfile({ session }: { session: Session }) {
     switch (activeSection) {
       case "ucp-profile":
         return <UcpSection session={session} />
+      case "karakter":
+          return <KarakterSection />
     }
   }
 
@@ -27,6 +30,8 @@ export default function UCPProfile({ session }: { session: Session }) {
     switch (activeSection) {
         case "ucp-profile":
           return "Ucp"
+        case "karakter":
+          return "Karakter"
     }
   }
 

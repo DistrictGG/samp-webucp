@@ -27,6 +27,7 @@ export function UcpSection({ session }: { session: Session }) {
     const createUcp = api.ucp.CreateUcp.useMutation({
         onSuccess: async () => {
           toast.success("Berhasil membuat UCP");
+          window.location.reload();
         },
         onError: async () => {
           toast.error("Gagal membuat UCP");
@@ -45,7 +46,7 @@ export function UcpSection({ session }: { session: Session }) {
 
     if(isLoading) return (
         <div className="space-y-6 flex flex-col items-center justify-center h-full">
-        <Loader2 className="h-10 w-10 animate-spin"/>
+            <Loader2 className="h-10 w-10 animate-spin"/>
         </div>
     )
     
