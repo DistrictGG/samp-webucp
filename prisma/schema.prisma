@@ -124,7 +124,7 @@ model Character {
     HaveHouse Int?            @default(0)
     House     Int?            @default(0) // if 0 = No House 
     InHouse   Int?            @default(0) // if 0 = Not in House, 1 = In House
-    status    String?         @db.VarChar(64) @default("offline")
+    playtime   Int?           @default(0)
     vehicle   Vehicles[]            
     playerskin skin_player[]
     inventory  Inventory[]
