@@ -38,7 +38,7 @@ export function KarakterSection() {
         );
     }
 
-    if (!sampleCharacters || sampleCharacters.length === 0 || !selectedCharacter) {
+    if (!sampleCharacters || !selectedCharacter) {
         return <div>No characters found.</div>;
     }
 
