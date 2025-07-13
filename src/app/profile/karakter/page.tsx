@@ -20,7 +20,7 @@ export interface Character {
     vip?: number // 0 = No VIP, 1 = VIP, 2 = Premium
 }
   
-export function KarakterSection() {
+export default function KarakterSection() {
     const { data: sampleCharacters, isLoading } = api.ucp.getCharacter.useQuery() as { data: Character[], isLoading: boolean } 
     const [selectedCharacter, setSelectedCharacter] = useState<Character | undefined>(undefined);
 

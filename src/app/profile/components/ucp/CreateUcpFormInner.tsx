@@ -7,7 +7,7 @@ import {
   FormMessage,
 } from "~/components/ui/form";
 import { Input } from "~/components/ui/input";
-import type { createUcpFormSchemaType } from "~/app/profile/forms";
+import type { createUcpFormSchemaType } from "~/app/profile/components/forms";
 
 export const CreateUcpFormInner = () => {
   const form = useFormContext<createUcpFormSchemaType>();

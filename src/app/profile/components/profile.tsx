@@ -7,24 +7,10 @@ import {Breadcrumb,BreadcrumbItem,BreadcrumbLink,BreadcrumbList,BreadcrumbPage,B
 import { Button } from "~/components/ui/button"
 import {DropdownMenu,DropdownMenuContent,DropdownMenuItem,DropdownMenuTrigger} from "~/components/ui/dropdown-menu"
 import { useTheme } from "next-themes"
-import type { Session } from "next-auth"
 
-//section
-import { UcpSection } from "~/app/profile/components/ucp/ucp"
-import { KarakterSection } from "~/app/profile/components/karakter/karakter"
-
-export default function UCPProfile({ session }: { session: Session }) {
+export default function UCPProfile({children,}: Readonly<{ children: React.ReactNode }>) {
   const { setTheme } = useTheme()
   const [activeSection, setActiveSection] = useState("ucp-profile")
-
-  const renderSection = () => {
-    switch (activeSection) {
-      case "ucp-profile":
-        return <UcpSection session={session} />
-      case "karakter":
-          return <KarakterSection />
-    }
-  }
 
   const getSectionTitle = () => {
     switch (activeSection) {
@@ -32,15 +18,16 @@ export default function UCPProfile({ session }: { session: Session }) {
           return "Ucp"
         case "karakter":
           return "Karakter"
+        case "store":
+          return "Store"
+        case "transaksi":
+          return "Transaksi"
     }
   }
 
   return (
     <SidebarProvider>
-      <AppSidebar
-        activeSection={activeSection}
-        onSectionChange={setActiveSection}
-      />
+      <AppSidebar activeSection={activeSection} onSectionChange={setActiveSection} />
       <SidebarInset>
         <header className="flex h-14 shrink-0 items-center gap-2 border-b px-4">
           <SidebarTrigger className="-ml-1" />
@@ -78,7 +65,7 @@ export default function UCPProfile({ session }: { session: Session }) {
             </DropdownMenu>
           </div>
         </header>
-        <div className="flex-1 p-6">{renderSection()}</div>
+        <main className="flex-1 p-6">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   )

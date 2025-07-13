@@ -1,7 +1,6 @@
 "use client"
-
-import type * as React from "react"
-import { Home, User, Car, Building, Shield, LogOut, User2 } from "lucide-react"
+import Link from "next/link"
+import { DollarSign, User, History, Shield, LogOut, User2 } from "lucide-react"
 
 import {
   Sidebar,
@@ -10,7 +9,6 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -22,26 +20,31 @@ const menuItems = [
     title: "Ucp",
     icon: User2,
     id: "ucp-profile",
+    link: "/profile",
   },
   {
     title: "Karakter",
     icon: User,
     id: "karakter",
+    link: "/profile/karakter",
   },
   {
-    title: "Vehicles",
-    icon: Car,
-    id: "vehicles",
+    title: "Store",
+    icon: DollarSign,
+    id: "store",
+    link: "/profile/store",
   },
   {
-    title: "Properties",
-    icon: Building,
-    id: "properties",
+    title: "Transaksi",
+    icon: History,
+    id: "transaksi",
+    link: "/profile/transaksi",
   },
   {
     title: "Security",
     icon: Shield,
     id: "security",
+    link: "/profile/security",
   }
 ]
 
@@ -59,7 +62,6 @@ export function AppSidebar({
     <Sidebar variant="inset" {...props }>
       <SidebarContent>
         <SidebarGroup>
-          {/* <SidebarGroupLabel className="text-sm px-3 font-medium">Character</SidebarGroupLabel> */}
           <SidebarGroupContent className="px-2">
           </SidebarGroupContent>
         </SidebarGroup>
@@ -70,14 +72,16 @@ export function AppSidebar({
             <SidebarMenu>
               {menuItems.map((item) => (
                 <SidebarMenuItem key={item.id}>
-                  <SidebarMenuButton
-                    isActive={activeSection === item.id}
-                    onClick={() => onSectionChange(item.id)}
-                    className="h-10 text-sm font-medium"
-                  >
-                    <item.icon className="h-4 w-4" />
-                    <span>{item.title}</span>
-                  </SidebarMenuButton>
+                  <Link href={item.link}>
+                    <SidebarMenuButton
+                      isActive={activeSection === item.id}
+                      onClick={() => onSectionChange(item.id)}
+                      className="h-10 text-sm font-medium"
+                    >
+                      <item.icon className="h-4 w-4" />
+                      <span>{item.title}</span>
+                    </SidebarMenuButton>
+                  </Link>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
