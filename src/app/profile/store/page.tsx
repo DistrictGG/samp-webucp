@@ -4,6 +4,7 @@ import { Button } from "~/components/ui/button"
 import { Coins, ShoppingCart, TrendingUp } from "lucide-react"
 import { api } from "~/trpc/react";
 import { toast } from "sonner"
+import { useRouter } from "next/navigation";
 
 export interface GoldList {
   id: number
@@ -24,45 +25,40 @@ const demoGoldList: GoldList[] = [
 
 export default function StoreSection() {
   const cratePayment = api.payment.PaymentCarteGold.useMutation({
+    onSuccess: (data) => {
+      if (data?.url) {
+        router.push(data.url);
+      }
+    },
     onError: async () => {
       toast.error("Gagal membuat Payment");
     }
   });
 
+  const router = useRouter();
+
   const handleBuyGold = (value: number, price: number) => {
-    const res = cratePayment.mutate({ price, value });
-    console.log(res);
+    cratePayment.mutate({ price, value });
   }
 
   return (
     <div className="space-y-8">
       {/* Header */}
       <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight">Gold Store</h1>
-            <p className="text-muted-foreground">Buy gold items and get discounts</p>
-        </div>
+          <h1 className="text-3xl font-bold tracking-tight">Gold Store</h1>
+          <p className="text-muted-foreground">Buy gold items and get discounts</p>
+      </div>
       {/* Gold Items Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {demoGoldList.map((item) => {
           const hasDiscount = item.diskon > 0
           const originalPrice = hasDiscount ? item.price / (1 - item.diskon / 100) : item.price
-          const isPopular = item.diskon >= 25
-
+          
           return (
             <Card
               key={item.id}
-              className={`relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group ${
-                isPopular ? "ring-2 ring-primary shadow-md" : ""
-              }`}
+              className={"relative transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group"}
             >
-              {isPopular && (
-                <div className="absolute -top-3 left-1/2 transform -translate-x-1/2 z-10">
-                  <div className="bg-primary text-primary-foreground text-xs font-semibold px-3 py-1 rounded-full shadow-lg flex items-center gap-1">
-                    <TrendingUp className="h-3 w-3" />
-                    Popular
-                  </div>
-                </div>
-              )}
 
               {hasDiscount && (
                 <div className="absolute -top-2 -right-2 z-10">
