@@ -2,7 +2,6 @@ import "~/styles/globals.css";
 import { Geist } from "next/font/google";
 import UCPProfile from "~/app/profile/components/profile";
 import { SessionProvider } from "next-auth/react";
-
 const geist = Geist({
   subsets: ["latin"],
   variable: "--font-geist-sans",
