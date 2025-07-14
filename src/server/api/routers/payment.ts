@@ -42,23 +42,41 @@ export const PaymentRouter = createTRPCRouter({
                     'name': `Gold-${input.value}`,
                     'price': amount,
                     'quantity': 1,
-                    'product_url': 'http://localhost:3000/profile',
+                    'product_url': 'http://localhost:3000/store',
                     'image_url': 'https://xau.ca/wp-content/uploads/2024/10/2-3.png'
                 }
             ],
-            'return_url': 'http://localhost:3000/profile',
+            'return_url': 'http://localhost:3000/store',
             'signature': signature
         }
 
-        axios.post('https://tripay.co.id/api-sandbox/transaction/create', payload, {
-            headers: { 'Authorization': 'Bearer ' + apikey },
-        })
-        .then((res) => {
-            console.log(res)
-            return { massage: "Berhasil membuat payment", status: 200, url: res.data.data.checkout_url};
-        })
-        .catch(() => {
+        try {
+            const res = await axios.post('https://tripay.co.id/api-sandbox/transaction/create', payload, {
+                headers: { 'Authorization': 'Bearer ' + apikey },
+            });
+            console.log(res.data.data)
+            await ctx.db.payment.create({
+                data: {
+                    orderid: res.data.data.reference,
+                    userid: ctx.session.user.id,
+                    price: input.price,
+                    value: input.value,
+                    name: `Gold ${input.value}`,
+                    status: "UNPAID",
+                    checkouturl: res.data.data.checkout_url
+                },
+            });
+            return { message: "Berhasil membuat payment", status: 200, url: res.data.data.checkout_url };
+        } catch (error) {
             throw new Error("Gagal membuat payment");
-        });
+        }
     }),
+    gatePaymentList: protectedProcedure
+      .query(async ({ ctx }) => {
+        const payments = await ctx.db.payment.findMany({
+          where: { userid: ctx.session.user.id },
+          orderBy: { createdAt: "desc" }
+        });
+        return payments;
+      }),
 })  
