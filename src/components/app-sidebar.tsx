@@ -20,7 +20,7 @@ const menuItems = [
     title: "Ucp",
     icon: User2,
     id: "ucp-profile",
-    link: "/profile",
+    link: "/profile/ucp",
   },
   {
     title: "Karakter",
