@@ -1,6 +1,7 @@
 # Samp Web Ucp
 
-Ask / Help Join To My Discord Server 
-
-# Indraa.Net Discord
-https://discord.gg/BgJasQsMhS
+fitur: 
+- discord oauth (next auth)
+- ucp (user control panel)
+- payment gateway (tripay)
+- wangsaf otp (fonnte)
