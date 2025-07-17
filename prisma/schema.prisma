@@ -48,15 +48,17 @@ model Session {
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
-    characterUcp   CharacterUcp[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  number        Int?
+  numberVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  posts         Post[]
+  characterUcp   CharacterUcp[]
 }
 
 model VerificationToken {
@@ -87,493 +89,498 @@ model Payment {
   updatedAt DateTime @updatedAt
 }
 
+//charucp sesuai kan dengan gm mu 
 model CharacterUcp {
     id         Int         @id @default(autoincrement())
-    userid     String?     @unique
-    user       User?       @relation(fields: [userid], references: [id], onDelete: Cascade)
-    ucp        String?     @unique @db.VarChar(255)
-    password   String?     @db.VarChar(255)
+    userid     String     @unique
+    user       User       @relation(fields: [userid], references: [id], onDelete: Cascade)
+    ucp        String     @unique @db.VarChar(255)
+    password   String     @db.VarChar(255)
     active     Int?        @default(0)
     codeverify Int?        @default(0)
     coin       Int?        @default(0)
     lastlogin  BigInt?     @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
     charactersByUserId Character[] @relation("CharacterToUserId")
     charactersByUcp    Character[] @relation("CharacterToUcp")
     @@index([ucp])
 }
 
-model Character {
-    id        Int             @id @default(autoincrement())
-    uuid      String          @db.VarChar(64)
-    userId    CharacterUcp    @relation("CharacterToUserId", fields: [uuid], references: [userid], onDelete: Cascade)
-    ucp       String          @db.VarChar(255)             
-    user      CharacterUcp    @relation("CharacterToUcp", fields: [ucp], references: [ucp])
-    name      String          @db.VarChar(100)
-    money     Int?            @default(0)
-    bankmoney Int?            @default(0)
-    admin     Int?            @default(0)
-    adminlevel Int?           @default(0)
-    posx      Float?          @default(0)     @db.Float
-    posy      Float?          @default(0)     @db.Float
-    posz      Float?          @default(0)     @db.Float
-    posa      Float?          @default(0)       
-    lasexit   BigInt?         @default(0)
-    gender    Int?            @default(1)         
-    skin      Int?            @default(0)   
-    age       Int?            @default(0)
-    birthdate String?         @db.VarChar(10)           
-    claimsp   Int?            @default(0)           
-    health    Float?          @default(1000)  @db.Float
-    armor     Float?          @default(0)     @db.Float
-    hunger    Int?            @default(100)
-    thirst    Int?            @default(100)
-    stress    Int?            @default(0)
-    level     Int?            @default(0)
-    levelup   Int?            @default(0)
-    dead      Int?            @default(0)
-    deadtime  Int?            @default(0)
-    vip       Int?            @default(0)
-    viptime   BigInt?         @default(0)
-    job       Int?            @default(0)
-    faction   Int?            @default(0)
-    factionGrade Int?         @default(0)
-    maxveh    Int?            @default(3)
-    weight    Float           @db.Float
-    delayjob  String          @db.LongText    @default("0|0|0|0|0|0|0|0|0|0")
-    HaveHouse Int?            @default(0)
-    House     Int?            @default(0) // if 0 = No House 
-    InHouse   Int?            @default(0) // if 0 = Not in House, 1 = In House
-    playtime   Int?           @default(0)
-    vehicle   Vehicles[]            
-    playerskin skin_player[]
-    inventory  Inventory[]
-    characterActivity CharacterActivity[]
-    @@index([ucp])
-}
+//jika tidak memaki gm ini hapus ini sampe bawah 
+  model Character {
+      id        Int             @id @default(autoincrement())
+      uuid      String          @db.VarChar(64)
+      userId    CharacterUcp    @relation("CharacterToUserId", fields: [uuid], references: [userid], onDelete: Cascade)
+      ucp       String          @db.VarChar(255)             
+      user      CharacterUcp    @relation("CharacterToUcp", fields: [ucp], references: [ucp])
+      name      String          @db.VarChar(100)
+      money     Int?            @default(0)
+      bankmoney Int?            @default(0)
+      admin     Int?            @default(0)
+      adminlevel Int?           @default(0)
+      posx      Float?          @default(0)     @db.Float
+      posy      Float?          @default(0)     @db.Float
+      posz      Float?          @default(0)     @db.Float
+      posa      Float?          @default(0)       
+      lasexit   BigInt?         @default(0)
+      gender    Int?            @default(1)         
+      skin      Int?            @default(0)   
+      age       Int?            @default(0)
+      birthdate String?         @db.VarChar(10)           
+      claimsp   Int?            @default(0)           
+      health    Float?          @default(1000)  @db.Float
+      armor     Float?          @default(0)     @db.Float
+      hunger    Int?            @default(100)
+      thirst    Int?            @default(100)
+      stress    Int?            @default(0)
+      level     Int?            @default(0)
+      levelup   Int?            @default(0)
+      dead      Int?            @default(0)
+      deadtime  Int?            @default(0)
+      vip       Int?            @default(0)
+      viptime   BigInt?         @default(0)
+      job       Int?            @default(0)
+      faction   Int?            @default(0)
+      factionGrade Int?         @default(0)
+      maxveh    Int?            @default(3)
+      weight    Float           @db.Float
+      delayjob  String          @db.LongText    @default("0|0|0|0|0|0|0|0|0|0")
+      HaveHouse Int?            @default(0)
+      House     Int?            @default(0) // if 0 = No House 
+      InHouse   Int?            @default(0) // if 0 = Not in House, 1 = In House
+      playtime   Int?           @default(0)
+      vehicle   Vehicles[]            
+      playerskin skin_player[]
+      inventory  Inventory[]
+      characterActivity CharacterActivity[]
+      @@index([ucp])
+  }
 
-model CharacterActivity {
-    id        Int       @id @default(autoincrement())
-    character Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
-    characterId Int
-    activity  String     @db.VarChar(255)
-    timestamp DateTime   @default(now())
-    @@index([characterId])
-}
+  model CharacterActivity {
+      id        Int       @id @default(autoincrement())
+      character Character  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+      characterId Int
+      activity  String     @db.VarChar(255)
+      timestamp DateTime   @default(now())
+      @@index([characterId])
+  }
 
-model public_garage {
-  pgID       Int     @id
-  Garage     Vehicles[]
-  pgName     String? @default("N/A") @db.VarChar(64)
-  pgType     Int     @default(0) // 0 = Public, 2 = Faction, 3 = Family
-  pgFaction  Int     @default(0)
-  pgPosX     Float?  @default(0) @db.Float
-  pgPosY     Float?  @default(0) @db.Float
-  pgPosZ     Float?  @default(0) @db.Float
-  pgSpawnX   Float?  @default(0) @db.Float
-  pgSpawnY   Float?  @default(0) @db.Float
-  pgSpawnZ   Float?  @default(0) @db.Float
-  pgSpawnA   Float?  @default(0) @db.Float
-  pgInterior Int     @default(0)
-  pgWorld    Int     @default(0)
-  public_garage_vehicle_faction public_garage_vehicle_faction[]
-  @@index([pgID])
-}
+  model public_garage {
+    pgID       Int     @id
+    Garage     Vehicles[]
+    pgName     String? @default("N/A") @db.VarChar(64)
+    pgType     Int     @default(0) // 0 = Public, 2 = Faction, 3 = Family
+    pgFaction  Int     @default(0)
+    pgPosX     Float?  @default(0) @db.Float
+    pgPosY     Float?  @default(0) @db.Float
+    pgPosZ     Float?  @default(0) @db.Float
+    pgSpawnX   Float?  @default(0) @db.Float
+    pgSpawnY   Float?  @default(0) @db.Float
+    pgSpawnZ   Float?  @default(0) @db.Float
+    pgSpawnA   Float?  @default(0) @db.Float
+    pgInterior Int     @default(0)
+    pgWorld    Int     @default(0)
+    public_garage_vehicle_faction public_garage_vehicle_faction[]
+    @@index([pgID])
+  }
 
-model public_garage_vehicle_faction {
-  pgID       Int     @id
-  public_garage public_garage @relation(fields: [pgID], references: [pgID], onDelete: Cascade)
-  factionID  Int     @default(0)
-  modelid    Int     @default(0)
-  status     Int     @default(0)
-  @@index([pgID])
-}
+  model public_garage_vehicle_faction {
+    pgID       Int     @id
+    public_garage public_garage @relation(fields: [pgID], references: [pgID], onDelete: Cascade)
+    factionID  Int     @default(0)
+    modelid    Int     @default(0)
+    status     Int     @default(0)
+    @@index([pgID])
+  }
 
-model Vehicles{
-  id        Int        @id @default(autoincrement())
-  ownerid   Int        @default(0)
-  owner     Character  @relation(fields: [ownerid], references: [id]) 
-  modelid   Int        @default(0)
-  posx      Float?     @default(0) @db.Float
-  posy      Float?     @default(0) @db.Float
-  posz      Float?     @default(0) @db.Float
-  posa      Float?     @default(0) @db.Float
-  plate     String?    @unique @db.VarChar(255)
-  color1    Int?       @default(0)
-  color2    Int?       @default(0)
-  body      String?    @db.LongText
-  vehhelt   Float?     @default(1000) @db.Float
-  fuel      Int?       @default(100)
-  parked    Int?       @default(0)
-  Garage    public_garage? @relation(fields: [parked], references: [pgID])
-  stored    Int?       @default(0)
-  rental    Int?       @default(0)
-  isSale    Int?       @default(0)
-  insu      Int?       @default(3) 
-  locked    Int?       @default(1)
-  modifications String @db.LongText
-  metadata  String @db.LongText
-  Vehiclesinventory    VehiclesInventory[]
-  @@index([modelid])
-}
+  model Vehicles{
+    id        Int        @id @default(autoincrement())
+    ownerid   Int        @default(0)
+    owner     Character  @relation(fields: [ownerid], references: [id]) 
+    modelid   Int        @default(0)
+    posx      Float?     @default(0) @db.Float
+    posy      Float?     @default(0) @db.Float
+    posz      Float?     @default(0) @db.Float
+    posa      Float?     @default(0) @db.Float
+    plate     String?    @unique @db.VarChar(255)
+    color1    Int?       @default(0)
+    color2    Int?       @default(0)
+    body      String?    @db.LongText
+    vehhelt   Float?     @default(1000) @db.Float
+    fuel      Int?       @default(100)
+    parked    Int?       @default(0)
+    Garage    public_garage? @relation(fields: [parked], references: [pgID])
+    stored    Int?       @default(0)
+    rental    Int?       @default(0)
+    isSale    Int?       @default(0)
+    insu      Int?       @default(3) 
+    locked    Int?       @default(1)
+    modifications String @db.LongText
+    metadata  String @db.LongText
+    Vehiclesinventory    VehiclesInventory[]
+    @@index([modelid])
+  }
 
-model VehiclesInventory{
-  id        Int @id @default(autoincrement())
-  vehid     Int
-  veh       Vehicles @relation(fields: [vehid], references: [id], onDelete: Cascade)
-  item      String
-  slot      Int
-  quantity  Int
-  @@index([vehid])
-}
+  model VehiclesInventory{
+    id        Int @id @default(autoincrement())
+    vehid     Int
+    veh       Vehicles @relation(fields: [vehid], references: [id], onDelete: Cascade)
+    item      String
+    slot      Int
+    quantity  Int
+    @@index([vehid])
+  }
 
-model atms {
-  id       Int    @id
-  posx     Float? @db.Float
-  posy     Float? @db.Float
-  posz     Float? @db.Float
-  posrx    Float? @db.Float
-  posry    Float? @db.Float
-  posrz    Float? @db.Float
-  interior Int?   @default(0)
-  world    Int?   @default(0)
+  model atms {
+    id       Int    @id
+    posx     Float? @db.Float
+    posy     Float? @db.Float
+    posz     Float? @db.Float
+    posrx    Float? @db.Float
+    posry    Float? @db.Float
+    posrz    Float? @db.Float
+    interior Int?   @default(0)
+    world    Int?   @default(0)
 
-  @@index([posx, posy, posz])
-}
-model Faction {
-  id          Int       @id
-  name        String    @unique @db.VarChar(50)
-  label       String?   @db.VarChar(50)
-  money       Int     @default(0)
-  job_grades  factionb_grades[] @relation("FactionToGrades")
-}
-model factionb_grades {
-  id          Int     @id @default(autoincrement())
-  faction_id  Int
-  faction     Faction @relation("FactionToGrades", fields: [faction_id], references: [id])
-  grade       Int
-  name        String  @db.VarChar(50)
-  label       String  @db.VarChar(50)
-  salary      Int
-  skin_male   Int
-  skin_female Int
-}
+    @@index([posx, posy, posz])
+  }
+  model Faction {
+    id          Int       @id
+    name        String    @unique @db.VarChar(50)
+    label       String?   @db.VarChar(50)
+    money       Int     @default(0)
+    job_grades  factionb_grades[] @relation("FactionToGrades")
+  }
+  model factionb_grades {
+    id          Int     @id @default(autoincrement())
+    faction_id  Int
+    faction     Faction @relation("FactionToGrades", fields: [faction_id], references: [id])
+    grade       Int
+    name        String  @db.VarChar(50)
+    label       String  @db.VarChar(50)
+    salary      Int
+    skin_male   Int
+    skin_female Int
+  }
 
-model Inventory {
-  id        Int @id @default(autoincrement())
-  ownerid   Int
-  owner     Character @relation(fields: [ownerid], references: [id], onDelete: Cascade)
-  item      String @unique
-  itemindex Int @unique
-  slot      Int 
-  quantity  Int
-  metadata  String   @db.LongText
-  @@index([ownerid])
-}
+  model Inventory {
+    id        Int @id @default(autoincrement())
+    ownerid   Int
+    owner     Character @relation(fields: [ownerid], references: [id], onDelete: Cascade)
+    item      String @unique
+    itemindex Int @unique
+    slot      Int 
+    quantity  Int
+    metadata  String   @db.LongText
+    @@index([ownerid])
+  }
 
-model SideInventory {
-  id        Int @id @default(autoincrement())
-  type      Int
-  ownerid   Int
-  item      String @unique
-  itemindex Int @unique
-  slot      Int
-  quantity  Int
-  metadata  String   @db.LongText
-}
+  model SideInventory {
+    id        Int @id @default(autoincrement())
+    type      Int
+    ownerid   Int
+    item      String @unique
+    itemindex Int @unique
+    slot      Int
+    quantity  Int
+    metadata  String   @db.LongText
+  }
 
-model skin_player {
-  id            Int       @id @default(autoincrement())
-  playerid      Int
-  player        Character @relation(fields: [playerid], references: [id])
-  status        Int       @default(0)
-  outfitname    String
-  skinid        Int
-  slot0modelid  Int       @default(0)
-  slot0bone     Int       @default(0)
-  slot0PosX     Float     @db.Float @default(0.0)
-  slot0PosY     Float     @db.Float @default(0.0)
-  slot0PosZ     Float     @db.Float @default(0.0)
-  slot0RotX     Float     @db.Float @default(0.0)
-  slot0RotY     Float     @db.Float @default(0.0)
-  slot0RotZ     Float     @db.Float @default(0.0)
-  slot0ScaleX   Float     @db.Float @default(0.0)
-  slot0ScaleY   Float     @db.Float @default(0.0)
-  slot0ScaleZ   Float     @db.Float @default(0.0)
-  slot1modelid  Int       @default(0)
-  slot1bone     Int       @default(0)
-  slot1PosX     Float     @db.Float @default(0.0)
-  slot1PosY     Float     @db.Float @default(0.0)
-  slot1PosZ     Float     @db.Float @default(0.0)
-  slot1RotX     Float     @db.Float @default(0.0)
-  slot1RotY     Float     @db.Float @default(0.0)
-  slot1RotZ     Float     @db.Float @default(0.0)
-  slot1ScaleX   Float     @db.Float @default(0.0)
-  slot1ScaleY   Float     @db.Float @default(0.0)
-  slot1ScaleZ   Float     @db.Float @default(0.0)
-  slot2modelid  Int       @default(0)
-  slot2bone     Int       @default(0)
-  slot2PosX     Float     @db.Float @default(0.0)
-  slot2PosY     Float     @db.Float @default(0.0)
-  slot2PosZ     Float     @db.Float @default(0.0)
-  slot2RotX     Float     @db.Float @default(0.0)
-  slot2RotY     Float     @db.Float @default(0.0)
-  slot2RotZ     Float     @db.Float @default(0.0)
-  slot2ScaleX   Float     @db.Float @default(0.0)
-  slot2ScaleY   Float     @db.Float @default(0.0)
-  slot2ScaleZ   Float     @db.Float @default(0.0)
-  slot3modelid  Int       @default(0)
-  slot3bone     Int       @default(0)
-  slot3PosX     Float     @db.Float @default(0.0)
-  slot3PosY     Float     @db.Float @default(0.0)
-  slot3PosZ     Float     @db.Float @default(0.0)
-  slot3RotX     Float     @db.Float @default(0.0)
-  slot3RotY     Float     @db.Float @default(0.0)
-  slot3RotZ     Float     @db.Float @default(0.0)
-  slot3ScaleX   Float     @db.Float @default(0.0)
-  slot3ScaleY   Float     @db.Float @default(0.0)
-  slot3ScaleZ   Float     @db.Float @default(0.0)
-  slot4modelid  Int       @default(0)
-  slot4bone     Int       @default(0)
-  slot4PosX     Float     @db.Float @default(0.0)
-  slot4PosY     Float     @db.Float @default(0.0)
-  slot4PosZ     Float     @db.Float @default(0.0)
-  slot4RotX     Float     @db.Float @default(0.0)
-  slot4RotY     Float     @db.Float @default(0.0)
-  slot4RotZ     Float     @db.Float @default(0.0)
-  slot4ScaleX   Float     @db.Float @default(0.0)
-  slot4ScaleY   Float     @db.Float @default(0.0)
-  slot4ScaleZ   Float     @db.Float @default(0.0)
-  slot5modelid  Int       @default(0)
-  slot5bone     Int       @default(0)
-  slot5PosX     Float     @db.Float @default(0.0)
-  slot5PosY     Float     @db.Float @default(0.0)
-  slot5PosZ     Float     @db.Float @default(0.0)
-  slot5RotX     Float     @db.Float @default(0.0)
-  slot5RotY     Float     @db.Float @default(0.0)
-  slot5RotZ     Float     @db.Float @default(0.0)
-  slot5ScaleX   Float     @db.Float @default(0.0)
-  slot5ScaleY   Float     @db.Float @default(0.0)
-  slot5ScaleZ   Float     @db.Float @default(0.0)
-  skinplayercode skin_player_code[] @relation("SkinPlayerToCode")
-}
+  model skin_player {
+    id            Int       @id @default(autoincrement())
+    playerid      Int
+    player        Character @relation(fields: [playerid], references: [id])
+    status        Int       @default(0)
+    outfitname    String
+    skinid        Int
+    slot0modelid  Int       @default(0)
+    slot0bone     Int       @default(0)
+    slot0PosX     Float     @db.Float @default(0.0)
+    slot0PosY     Float     @db.Float @default(0.0)
+    slot0PosZ     Float     @db.Float @default(0.0)
+    slot0RotX     Float     @db.Float @default(0.0)
+    slot0RotY     Float     @db.Float @default(0.0)
+    slot0RotZ     Float     @db.Float @default(0.0)
+    slot0ScaleX   Float     @db.Float @default(0.0)
+    slot0ScaleY   Float     @db.Float @default(0.0)
+    slot0ScaleZ   Float     @db.Float @default(0.0)
+    slot1modelid  Int       @default(0)
+    slot1bone     Int       @default(0)
+    slot1PosX     Float     @db.Float @default(0.0)
+    slot1PosY     Float     @db.Float @default(0.0)
+    slot1PosZ     Float     @db.Float @default(0.0)
+    slot1RotX     Float     @db.Float @default(0.0)
+    slot1RotY     Float     @db.Float @default(0.0)
+    slot1RotZ     Float     @db.Float @default(0.0)
+    slot1ScaleX   Float     @db.Float @default(0.0)
+    slot1ScaleY   Float     @db.Float @default(0.0)
+    slot1ScaleZ   Float     @db.Float @default(0.0)
+    slot2modelid  Int       @default(0)
+    slot2bone     Int       @default(0)
+    slot2PosX     Float     @db.Float @default(0.0)
+    slot2PosY     Float     @db.Float @default(0.0)
+    slot2PosZ     Float     @db.Float @default(0.0)
+    slot2RotX     Float     @db.Float @default(0.0)
+    slot2RotY     Float     @db.Float @default(0.0)
+    slot2RotZ     Float     @db.Float @default(0.0)
+    slot2ScaleX   Float     @db.Float @default(0.0)
+    slot2ScaleY   Float     @db.Float @default(0.0)
+    slot2ScaleZ   Float     @db.Float @default(0.0)
+    slot3modelid  Int       @default(0)
+    slot3bone     Int       @default(0)
+    slot3PosX     Float     @db.Float @default(0.0)
+    slot3PosY     Float     @db.Float @default(0.0)
+    slot3PosZ     Float     @db.Float @default(0.0)
+    slot3RotX     Float     @db.Float @default(0.0)
+    slot3RotY     Float     @db.Float @default(0.0)
+    slot3RotZ     Float     @db.Float @default(0.0)
+    slot3ScaleX   Float     @db.Float @default(0.0)
+    slot3ScaleY   Float     @db.Float @default(0.0)
+    slot3ScaleZ   Float     @db.Float @default(0.0)
+    slot4modelid  Int       @default(0)
+    slot4bone     Int       @default(0)
+    slot4PosX     Float     @db.Float @default(0.0)
+    slot4PosY     Float     @db.Float @default(0.0)
+    slot4PosZ     Float     @db.Float @default(0.0)
+    slot4RotX     Float     @db.Float @default(0.0)
+    slot4RotY     Float     @db.Float @default(0.0)
+    slot4RotZ     Float     @db.Float @default(0.0)
+    slot4ScaleX   Float     @db.Float @default(0.0)
+    slot4ScaleY   Float     @db.Float @default(0.0)
+    slot4ScaleZ   Float     @db.Float @default(0.0)
+    slot5modelid  Int       @default(0)
+    slot5bone     Int       @default(0)
+    slot5PosX     Float     @db.Float @default(0.0)
+    slot5PosY     Float     @db.Float @default(0.0)
+    slot5PosZ     Float     @db.Float @default(0.0)
+    slot5RotX     Float     @db.Float @default(0.0)
+    slot5RotY     Float     @db.Float @default(0.0)
+    slot5RotZ     Float     @db.Float @default(0.0)
+    slot5ScaleX   Float     @db.Float @default(0.0)
+    slot5ScaleY   Float     @db.Float @default(0.0)
+    slot5ScaleZ   Float     @db.Float @default(0.0)
+    skinplayercode skin_player_code[] @relation("SkinPlayerToCode")
+  }
 
-model skin_player_code {
-  id          Int     @id @default(autoincrement())
-  outfitid    Int
-  outfit      skin_player @relation("SkinPlayerToCode", fields: [outfitid], references: [id], onDelete: Cascade)
-  code        String
-}
+  model skin_player_code {
+    id          Int     @id @default(autoincrement())
+    outfitid    Int
+    outfit      skin_player @relation("SkinPlayerToCode", fields: [outfitid], references: [id], onDelete: Cascade)
+    code        String
+  }
 
-model Safe {
-  id        Int     @id @default(autoincrement())
-  Faction   Int     @default(-1)
-  Ownerid   Int     @default(-1)
-  Name      String
-  PosX      Float   @default(0)
-  PosY      Float   @default(0)
-  PosZ      Float   @default(0)
-  Interior  Int     @default(0)
-  World     Int     @default(0)
-}
-model BossMenu {
-  factionid Int     @id
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
-  interior  Int     @default(0)
-  world     Int     @default(0)
-}
+  model Safe {
+    id        Int     @id @default(autoincrement())
+    Faction   Int     @default(-1)
+    Ownerid   Int     @default(-1)
+    Name      String
+    PosX      Float   @default(0)
+    PosY      Float   @default(0)
+    PosZ      Float   @default(0)
+    Interior  Int     @default(0)
+    World     Int     @default(0)
+  }
+  model BossMenu {
+    factionid Int     @id
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
+    interior  Int     @default(0)
+    world     Int     @default(0)
+  }
 
-model Door {
-  ID        Int      @id
-  name      String?  @default("None") @db.VarChar(50)
-  password  String?  @default("") @db.VarChar(50)
-  icon      Int?     @default(19130)
-  locked    Int      @default(0)
-  admin     Int      @default(0)
-  vip       Int      @default(0)
-  faction   Int      @default(0)
-  family    Int      @default(-1)
-  extvw     Int?     @default(0)
-  extint    Int?     @default(0)
-  extposx   Float?   @default(0)
-  extposy   Float?   @default(0)
-  extposz   Float?   @default(0)
-  extposa   Float?   @default(0)
-  intvw     Int?     @default(0)
-  intint    Int      @default(0)
-  intposx   Float?   @default(0)
-  intposy   Float?   @default(0)
-  intposz   Float?   @default(0)
-  intposa   Float?   @default(0)
+  model Door {
+    ID        Int      @id
+    name      String?  @default("None") @db.VarChar(50)
+    password  String?  @default("") @db.VarChar(50)
+    icon      Int?     @default(19130)
+    locked    Int      @default(0)
+    admin     Int      @default(0)
+    vip       Int      @default(0)
+    faction   Int      @default(0)
+    family    Int      @default(-1)
+    extvw     Int?     @default(0)
+    extint    Int?     @default(0)
+    extposx   Float?   @default(0)
+    extposy   Float?   @default(0)
+    extposz   Float?   @default(0)
+    extposa   Float?   @default(0)
+    intvw     Int?     @default(0)
+    intint    Int      @default(0)
+    intposx   Float?   @default(0)
+    intposy   Float?   @default(0)
+    intposz   Float?   @default(0)
+    intposa   Float?   @default(0)
 
-  @@map("doors")
-}
+    @@map("doors")
+  }
 
-model StoreClothes {
-  id        Int     @id
-  type      Int     @default(0)
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
-  interior  Int     @default(0)
-  world     Int     @default(0)
-}
+  model StoreClothes {
+    id        Int     @id
+    type      Int     @default(0)
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
+    interior  Int     @default(0)
+    world     Int     @default(0)
+  }
 
-model House {
-  id        Int     @id
-  name      String? @db.VarChar(64)
-  type      Int     @default(0)
-  ownerid   Int?    @default(0)
-  ownername String? @db.VarChar(64) @default("no")
-  haveowner Boolean?@default(false) 
-  posx      Float?  @default(0) @db.Float
-  posy      Float?  @default(0) @db.Float
-  posz      Float?  @default(0) @db.Float
-  price     Int?    @default(0)
-  loadmap   Int?    @default(0)
-  safe      Int?    @default(0) // 0 = No Safe, 1 = Safe
-  safePosX  Float?  @default(0) @db.Float
-  safePosY  Float?  @default(0) @db.Float
-  safePosZ  Float?  @default(0) @db.Float
-  haveChackpoint Int? @default(0) // 0 = No Checkpoint, 1 = Checkpoint just type 2 up 
-  checkpointPosX Float? @default(0) @db.Float
-  checkpointPosY Float? @default(0) @db.Float
-  checkpointPosZ Float? @default(0) @db.Float
-  interiorcheckpointx Float? @default(0) @db.Float
-  interiorcheckpointy Float? @default(0) @db.Float
-  interiorcheckpointz Float? @default(0) @db.Float
-  Locked   Int?    @default(0) // 0 = Unlocked, 1 = Locked
-  HouseMap   HouseMap[]
-}
-model HouseMap {
-  id        Int      @id @default(autoincrement())
-  houseid   Int
-  house     House    @relation(fields: [houseid], references: [id], onDelete: Cascade)
-  data      String   @db.LongText
-}
-model smartdooor {
-  id      Int     @id
-  modelid Int     @default(0)
-  type    Int     @default(0)
-  host    Int     @default(0)
-  posx    Float   @db.Float @default(0)
-  posy    Float   @db.Float @default(0)
-  posz    Float   @db.Float @default(0)
-  openx   Float   @db.Float @default(0)
-  openy   Float   @db.Float @default(0)
-  openz   Float   @db.Float @default(0)
-  openrotx Float   @db.Float @default(0)
-  openroty Float   @db.Float @default(0)
-  openrotz Float   @db.Float @default(0)
-  closex  Float   @db.Float @default(0)
-  closey  Float   @db.Float @default(0)
-  closez  Float   @db.Float @default(0)
-  closerotx Float   @db.Float @default(0)
-  closeroty Float   @db.Float @default(0)
-  closerotz Float   @db.Float @default(0)
-  mindistancex Float @db.Float @default(0)
-  mindistancey Float @db.Float @default(0)
-  maxdistancex Float @db.Float @default(0)
-  maxdistancey Float @db.Float @default(0)
-  lock       Int     @default(0)
-  owner      Int     @default(0)
-  haveowner  Int     @default(0)
-  hostRelation smartdoorclient[] @relation("HostDoor")
-  doorRelation smartdoorclient[] @relation("ConnectedDoor")
-}
+  model House {
+    id        Int     @id
+    name      String? @db.VarChar(64)
+    type      Int     @default(0)
+    ownerid   Int?    @default(0)
+    ownername String? @db.VarChar(64) @default("no")
+    haveowner Boolean?@default(false) 
+    posx      Float?  @default(0) @db.Float
+    posy      Float?  @default(0) @db.Float
+    posz      Float?  @default(0) @db.Float
+    price     Int?    @default(0)
+    loadmap   Int?    @default(0)
+    safe      Int?    @default(0) // 0 = No Safe, 1 = Safe
+    safePosX  Float?  @default(0) @db.Float
+    safePosY  Float?  @default(0) @db.Float
+    safePosZ  Float?  @default(0) @db.Float
+    haveChackpoint Int? @default(0) // 0 = No Checkpoint, 1 = Checkpoint just type 2 up 
+    checkpointPosX Float? @default(0) @db.Float
+    checkpointPosY Float? @default(0) @db.Float
+    checkpointPosZ Float? @default(0) @db.Float
+    interiorcheckpointx Float? @default(0) @db.Float
+    interiorcheckpointy Float? @default(0) @db.Float
+    interiorcheckpointz Float? @default(0) @db.Float
+    Locked   Int?    @default(0) // 0 = Unlocked, 1 = Locked
+    HouseMap   HouseMap[]
+  }
+  model HouseMap {
+    id        Int      @id @default(autoincrement())
+    houseid   Int
+    house     House    @relation(fields: [houseid], references: [id], onDelete: Cascade)
+    data      String   @db.LongText
+  }
+  model smartdooor {
+    id      Int     @id
+    modelid Int     @default(0)
+    type    Int     @default(0)
+    host    Int     @default(0)
+    posx    Float   @db.Float @default(0)
+    posy    Float   @db.Float @default(0)
+    posz    Float   @db.Float @default(0)
+    openx   Float   @db.Float @default(0)
+    openy   Float   @db.Float @default(0)
+    openz   Float   @db.Float @default(0)
+    openrotx Float   @db.Float @default(0)
+    openroty Float   @db.Float @default(0)
+    openrotz Float   @db.Float @default(0)
+    closex  Float   @db.Float @default(0)
+    closey  Float   @db.Float @default(0)
+    closez  Float   @db.Float @default(0)
+    closerotx Float   @db.Float @default(0)
+    closeroty Float   @db.Float @default(0)
+    closerotz Float   @db.Float @default(0)
+    mindistancex Float @db.Float @default(0)
+    mindistancey Float @db.Float @default(0)
+    maxdistancex Float @db.Float @default(0)
+    maxdistancey Float @db.Float @default(0)
+    lock       Int     @default(0)
+    owner      Int     @default(0)
+    haveowner  Int     @default(0)
+    hostRelation smartdoorclient[] @relation("HostDoor")
+    doorRelation smartdoorclient[] @relation("ConnectedDoor")
+  }
 
-model smartdoorclient {
-  id       Int     @id @default(autoincrement())
-  hostdoor Int
-  host    smartdooor @relation("HostDoor", fields: [hostdoor], references: [id], onDelete: Cascade)
-  doorid   Int 
-  door    smartdooor @relation("ConnectedDoor", fields: [doorid], references: [id], onDelete: Cascade)
-}
+  model smartdoorclient {
+    id       Int     @id @default(autoincrement())
+    hostdoor Int
+    host    smartdooor @relation("HostDoor", fields: [hostdoor], references: [id], onDelete: Cascade)
+    doorid   Int 
+    door    smartdooor @relation("ConnectedDoor", fields: [doorid], references: [id], onDelete: Cascade)
+  }
 
-model race {
-  id      Int     @id
-  name    String
-  veehicle Int
-  posx     Float @db.Float
-  posy     Float @db.Float
-  posz     Float @db.Float
-  posa     Float @db.Float
-  racetrack ractrack[] @relation("RaceTrack")
-}
+  model race {
+    id      Int     @id
+    name    String
+    veehicle Int
+    posx     Float @db.Float
+    posy     Float @db.Float
+    posz     Float @db.Float
+    posa     Float @db.Float
+    racetrack ractrack[] @relation("RaceTrack")
+  }
 
-model ractrack  {
-  id       Int   @id @default(autoincrement())
-  raceid   Int
-  race     race @relation("RaceTrack", fields: [raceid], references: [id], onDelete: Cascade)
-  checkpoint Int
-  posx     Float @db.Float
-  posy     Float @db.Float
-  posz     Float @db.Float
-}
+  model ractrack  {
+    id       Int   @id @default(autoincrement())
+    raceid   Int
+    race     race @relation("RaceTrack", fields: [raceid], references: [id], onDelete: Cascade)
+    checkpoint Int
+    posx     Float @db.Float
+    posy     Float @db.Float
+    posz     Float @db.Float
+  }
 
-model jobs {
-  id    Int @id
-  data  String? @db.LongText
-}
+  model jobs {
+    id    Int @id
+    data  String? @db.LongText
+  }
 
-model loadmapping {
-  id     Int  @id @default(autoincrement())
-  name   String @unique
-}
+  model loadmapping {
+    id     Int  @id @default(autoincrement())
+    name   String @unique
+  }
 
-model lumber {
-  id        Int     @id
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
-}
+  model lumber {
+    id        Int     @id
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
+  }
 
-model farmer {
-  id        Int     @id
-  type      Int     @default(0) // 0 public , 1 private
+  model farmer {
+    id        Int     @id
+    type      Int     @default(0) // 0 public , 1 private
 
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
 
-  zoneminx   Float   @db.Float @default(0)
-  zoneminy   Float   @db.Float @default(0)
-  zonemax   Float   @db.Float @default(0)
-  zonemaz   Float   @db.Float @default(0)
+    zoneminx   Float   @db.Float @default(0)
+    zoneminy   Float   @db.Float @default(0)
+    zonemax   Float   @db.Float @default(0)
+    zonemaz   Float   @db.Float @default(0)
 
-  plantcreatex Float   @db.Float @default(0)
-  plantcreatey Float   @db.Float @default(0)
-  plantcreatez Float   @db.Float @default(0)
-  plantstock   Int     @default(0)
-  //private
-  ownerid   Int     @default(0)
-  ownername String? @db.VarChar(64) @default("no")
-  haveowner Boolean? @default(false) // 0 = No Owner, 1 = Have Owner
-  price     Int?    @default(0) // Price to buy the farm
-  stock     String? @db.LongText // JSON format for stock
-  employees String? @db.LongText // JSON format for employees
+    plantcreatex Float   @db.Float @default(0)
+    plantcreatey Float   @db.Float @default(0)
+    plantcreatez Float   @db.Float @default(0)
+    plantstock   Int     @default(0)
+    //private
+    ownerid   Int     @default(0)
+    ownername String? @db.VarChar(64) @default("no")
+    haveowner Boolean? @default(false) // 0 = No Owner, 1 = Have Owner
+    price     Int?    @default(0) // Price to buy the farm
+    stock     String? @db.LongText // JSON format for stock
+    employees String? @db.LongText // JSON format for employees
 
-  farmerplat farmer_plant[]
-}
+    farmerplat farmer_plant[]
+  }
 
-model farmer_plant {
-  id        Int     @id @default(autoincrement())
-  farmid    Int
-  farm      farmer  @relation(fields: [farmid], references: [id], onDelete: Cascade)
-  plantid   Int     @default(0)
-  ownerid   Int     @default(0)
-  ownername String? @db.VarChar(64) @default("no")
-  planttype Int     @default(0)
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
-  time      Int
-}
+  model farmer_plant {
+    id        Int     @id @default(autoincrement())
+    farmid    Int
+    farm      farmer  @relation(fields: [farmid], references: [id], onDelete: Cascade)
+    plantid   Int     @default(0)
+    ownerid   Int     @default(0)
+    ownername String? @db.VarChar(64) @default("no")
+    planttype Int     @default(0)
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
+    time      Int
+  }
 
-model stone_miner {
-  id        Int     @id
-  posx      Float   @db.Float @default(0)
-  posy      Float   @db.Float @default(0)
-  posz      Float   @db.Float @default(0)
-}
+  model stone_miner {
+    id        Int     @id
+    posx      Float   @db.Float @default(0)
+    posy      Float   @db.Float @default(0)
+    posz      Float   @db.Float @default(0)
+  }
+///////////////////////////////////////////////////////
