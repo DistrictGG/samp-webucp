@@ -4,7 +4,7 @@ import { api } from "~/trpc/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "~/components/ui/form";
-import { CreateUcpFormInner } from "../components/ucp/CreateUcpFormInner";
+import { CreateUcpFormInner } from "./components/CreateUcpFormInner";
 import { useSession } from "next-auth/react";
 
 
@@ -14,8 +14,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
 import { Button } from "~/components/ui/button"
 import { User, CheckCircle, Coins, Key, Loader2 } from "lucide-react"
 import { toast } from "sonner"
-import { createUcpFormSchema } from "~/app/profile/components/forms";
-import type { createUcpFormSchemaType } from "~/app/profile/components/forms";
+import { createUcpFormSchema } from "~/app/profile/ucp/components/forms";
+import type { createUcpFormSchemaType } from "~/app/profile/ucp/components/forms";
 
 interface UCPProfileData {
   id: number
@@ -49,6 +49,7 @@ export default function Profile() {
     const handleCreateUcpSubmit = (values: createUcpFormSchemaType) => {
         createUcp.mutate({
             username: values.username,
+            password: values.password
         });
     }
 
@@ -59,22 +60,36 @@ export default function Profile() {
     )
     
     if(!ucpProfile) return (
-        <div className="space-y-6 flex flex-col items-center justify-center h-full">
-        <Card className="border-border/50 bg-card/50 backdrop-blur-sm shadow-lg">
-            <CardHeader className="border-b border-border/50">
-            <CardTitle>Ucp Profile</CardTitle>
-            <CardDescription>Kamu Tidak Memiliki Silahkan Buat UCP Terlebih Dahulu</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-            <div className="flex flex-col items-center justify-center">
-                <Form {...form}>
-                    <CreateUcpFormInner/>
-                </Form>
-
-                <Button disabled={!form.formState.isDirty} onClick={form.handleSubmit(handleCreateUcpSubmit)} className="mt-4 w-full">Simpan</Button>
-            </div>
-            </CardContent>
-        </Card>
+        <div className="space-y-9 flex flex-col items-center justify-center h-full">
+            <Card className="border-border/50 bg-card/70 backdrop-blur-md shadow-2xl animate-fade-in-up w-full max-w-md">
+                <CardHeader className="border-b border-border/50 flex flex-col items-center">
+                  <div className="mb-2 flex flex-col items-center">
+                    <Avatar className="w-16 h-16 border-2 border-blue-400/40 bg-blue-50 dark:bg-blue-900/20 mb-2">
+                      <AvatarImage src="/ucp-empty.svg" alt="No UCP" />
+                      <AvatarFallback className="text-2xl bg-blue-100 dark:bg-blue-900/30">
+                        <User className="text-blue-400" />
+                      </AvatarFallback>
+                    </Avatar>
+                    <CardTitle className="text-xl font-bold text-blue-700 dark:text-blue-300">Belum Ada Akun UCP</CardTitle>
+                    <CardDescription className="text-center text-base mt-1 text-muted-foreground">Kamu belum memiliki akun UCP.<br />Buat akun UCP untuk mulai bermain di server ini.</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="space-y-3 pt-1 flex flex-col items-center">
+                    <div className="flex flex-col items-center justify-center space-y-2 w-full">
+                        <div className="w-full">
+                          <Form {...form}>
+                              <CreateUcpFormInner/>
+                          </Form>
+                        </div>
+                        <Button 
+                          disabled={!form.formState.isDirty} 
+                          onClick={form.handleSubmit(handleCreateUcpSubmit)}
+                          className="w-full">
+                          Buat Akun Sekarang
+                        </Button>
+                    </div>
+                </CardContent>
+            </Card>
         </div>
     )
 

@@ -2,22 +2,21 @@ import { z } from "zod";
 import axios  from "axios";
 import crypto from "crypto";
 
-import { createTRPCRouter, protectedProcedure, publicProcedure} from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure} from "~/server/api/trpc";
+
+interface TripayCreateResponse {
+  success: boolean;
+  message: string;
+  data: {
+    reference: string;
+    checkout_url: string;
+  };
+}
 
 export const PaymentRouter = createTRPCRouter({
     PaymentCarteGold: protectedProcedure
     .input(z.object({ price: z.number(), value: z.number()}))
     .mutation(async ({ ctx, input }) => {
-        // return ctx.db.payment.create({
-        //     data: {
-        //         userid: ctx.session.user.id,
-        //         price: input.price,
-        //         value: input.value,
-        //         name: `Gold ${input.value}`,
-        //         status: "pending",
-        //     },
-        // });
-        
         const apikey        = process.env.ApiKey ?? "";
         const privateKey    = process.env.PrivateKey ?? "";
         console.log(apikey, privateKey)
@@ -51,9 +50,11 @@ export const PaymentRouter = createTRPCRouter({
         }
 
         try {
-            const res = await axios.post('https://tripay.co.id/api-sandbox/transaction/create', payload, {
-                headers: { 'Authorization': 'Bearer ' + apikey },
-            });
+            const res = await axios.post<TripayCreateResponse>(
+                'https://tripay.co.id/api-sandbox/transaction/create',
+                payload,
+                { headers: { 'Authorization': 'Bearer ' + apikey } }
+            );
             console.log(res.data.data)
             await ctx.db.payment.create({
                 data: {
@@ -67,7 +68,7 @@ export const PaymentRouter = createTRPCRouter({
                 },
             });
             return { message: "Berhasil membuat payment", status: 200, url: res.data.data.checkout_url };
-        } catch (error) {
+        } catch {
             throw new Error("Gagal membuat payment");
         }
     }),
