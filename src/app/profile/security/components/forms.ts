@@ -37,3 +37,9 @@ export const OtpSchema = z.object({
 
 export type PhoneSchemaType = z.infer<typeof PhoneSchema>
 export type OtpSchemaType = z.infer<typeof OtpSchema>
+
+export function formatPhoneNumber(phoneNumber: string) {
+  if (phoneNumber.startsWith("62")) return phoneNumber;
+  if (phoneNumber.startsWith("8")) return "62" + phoneNumber;
+  return phoneNumber;
+}

@@ -7,7 +7,7 @@ import { Label } from "~/components/ui/label";
 import { type ChangePasswordSchemaType } from "~/app/profile/security/components/forms";
 import { useState } from "react";
 
-type ChangePasswordInnerProps = { onCanghePassword: (values: ChangePasswordSchemaType) => void; isLoading?: boolean; showPassword?: boolean};
+type ChangePasswordInnerProps = { onChangePassword: (values: ChangePasswordSchemaType) => void; isLoading?: boolean; showPassword?: boolean};
 export const ChangePasswordFormInner = (props: ChangePasswordInnerProps) => {
   const form = useFormContext<ChangePasswordSchemaType>();
 
@@ -15,7 +15,7 @@ export const ChangePasswordFormInner = (props: ChangePasswordInnerProps) => {
 
   return (
     <form
-      onSubmit={form.handleSubmit(props.onCanghePassword)}
+      onSubmit={form.handleSubmit(props.onChangePassword)}
       className="flex flex-col gap-y-1"
     >
         <FormField

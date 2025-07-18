@@ -92,10 +92,11 @@ model Payment {
 
 model Otp {
   id        Int      @id @default(autoincrement())
-  userid     String     @unique
-  user       User       @relation(fields: [userid], references: [id], onDelete: Cascade)
-  otpNumber  String
+  userid    String   @unique
+  user      User     @relation(fields: [userid], references: [id], onDelete: Cascade)
+  otpNumber String
   verified  DateTime?
+  expiry    DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

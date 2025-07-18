@@ -9,7 +9,6 @@ export async function middleware(request: NextRequest) {
   {
     return NextResponse.redirect(new URL('/api/auth/signin', request.url))
   }
-  console.log(token)
 }
  
 export const config = {

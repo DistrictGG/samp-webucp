@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useMemo, useCallback, useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
 import { Badge } from "~/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs"
 import { Progress } from "~/components/ui/progress"
-import { User, Wallet, Loader2} from "lucide-react"
+import { User, Wallet } from "lucide-react"
+import { Skeleton } from "~/components/ui/skeleton"
 import { api } from "~/trpc/react"
 
 export interface Character {
@@ -21,37 +21,119 @@ export interface Character {
 }
   
 export default function KarakterSection() {
-    const { data: sampleCharacters, isLoading } = api.ucp.getCharacter.useQuery() as { data: Character[], isLoading: boolean } 
-    const [selectedCharacter, setSelectedCharacter] = useState<Character | undefined>(undefined);
+    const { data: sampleCharacters, isLoading, isError, refetch } = api.ucp.getCharacter.useQuery();
+    const [selectedCharacterId, setSelectedCharacterId] = useState<number | undefined>(undefined);
+
+    const characterList = useMemo(() => sampleCharacters ?? [], [sampleCharacters]);
+
+    const selectedCharacter = useMemo(
+        () => characterList.find(c => c.id === selectedCharacterId) ?? characterList[0],
+        [characterList, selectedCharacterId]
+    );
+
+    const handleSelectCharacter = useCallback((id: number) => {
+        setSelectedCharacterId(id);
+    }, []);
 
     useEffect(() => {
         if (sampleCharacters && sampleCharacters.length > 0) {
-            setSelectedCharacter(sampleCharacters[0]);
+            setSelectedCharacterId(sampleCharacters[0]?.id);
         }
     }, [sampleCharacters]);
 
     if (isLoading) {
         return (
-            <div className="space-y-6 flex flex-col items-center justify-center h-full">
-                <Loader2 className="h-10 w-10 animate-spin"/>
+            <div className="space-y-6">
+                <div className="space-y-1">
+                    <Skeleton className="h-8 w-60 rounded" />
+                    <Skeleton className="h-5 w-80 rounded" />
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                    {[1, 2].map((i) => (
+                        <Card key={i} className="cursor-pointer">
+                            <CardContent className="p-4">
+                                <div className="flex items-center space-x-4">
+                                    <Skeleton className="w-16 h-16 rounded-full" />
+                                    <div className="flex-1 min-w-0">
+                                        <Skeleton className="h-6 w-32 mb-2 rounded" />
+                                        <Skeleton className="h-4 w-20 rounded" />
+                                    </div>
+                                </div>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+                <div className="grid gap-3">
+                    <Card className="lg:col-span-2">
+                        <CardHeader>
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <Skeleton className="h-7 w-40 mb-2 rounded" />
+                                    <Skeleton className="h-4 w-32 rounded" />
+                                </div>
+                                <div className="text-right">
+                                    <Skeleton className="h-7 w-24 mb-2 rounded" />
+                                    <Skeleton className="h-4 w-28 rounded" />
+                                </div>
+                            </div>
+                            <Skeleton className="h-3 w-full mt-2 rounded" />
+                        </CardHeader>
+                        <CardContent className="space-y-6">
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                <div className="space-y-3">
+                                    <Skeleton className="h-5 w-36 mb-2 rounded" />
+                                    <div className="space-y-2 text-sm">
+                                        <Skeleton className="h-4 w-32 mb-1 rounded" />
+                                        <Skeleton className="h-4 w-28 mb-1 rounded" />
+                                        <Skeleton className="h-4 w-24 rounded" />
+                                    </div>
+                                </div>
+                                <div className="space-y-3">
+                                    <Skeleton className="h-5 w-28 mb-2 rounded" />
+                                    <div className="space-y-2 text-sm">
+                                        <Skeleton className="h-4 w-24 mb-1 rounded" />
+                                        <Skeleton className="h-4 w-24 mb-1 rounded" />
+                                        <Skeleton className="h-4 w-28 rounded" />
+                                    </div>
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
             </div>
         );
     }
 
+    if (isError) {
+        return <div>Gagal memuat data karakter. <button onClick={() => refetch()}>Coba Lagi</button></div>
+    }
+
     if (!sampleCharacters || !selectedCharacter) {
-        return <div>No characters found.</div>;
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] w-full">
+                <div className="max-w-md w-full">
+                    <Card className="flex flex-col items-center p-10 bg-white/70 dark:bg-background/70 shadow-xl border border-border rounded-2xl">
+                        <div className="mb-6">
+                            <User className="w-8 h-8 text-muted-foreground" />
+                        </div>
+                        <div className="text-2xl font-bold mb-2 text-center text-primary">Belum Ada Karakter</div>
+                        <div className="text-muted-foreground text-center mb-6">Anda belum membuat karakter. Mulailah petualangan Anda dengan membuat karakter pertama!</div>
+                    </Card>
+                </div>
+            </div>
+        );
     }
 
     return (
         <div className="space-y-6">
             <div className="space-y-1">
-                <h1 className="text-3xl font-bold tracking-tight">Character Management</h1>
-                <p className="text-muted-foreground">Manage and view your character information and statistics</p>
+                <h1 className="text-3xl font-bold tracking-tight">Manajemen Karakter</h1>
+                <p className="text-muted-foreground">Kelola dan lihat informasi serta statistik karakter Anda</p>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
-                {sampleCharacters.map((character) => (
-                    <Card key={character.id} className={`cursor-pointer transition-all hover:shadow-md ${ selectedCharacter.id === character.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm"}`} onClick={() => setSelectedCharacter(character)}>
+                {characterList.map((character) => (
+                    <Card key={character.id} className={`cursor-pointer transition-all hover:shadow-md ${ selectedCharacter.id === character.id ? "ring-2 ring-primary shadow-md" : "hover:shadow-sm"}`} onClick={() => handleSelectCharacter(character.id)}>
                         <CardContent className="p-4">
                             <div className="flex items-center space-x-4">
                                 <div className="relative">
@@ -67,7 +149,7 @@ export default function KarakterSection() {
                                         <h3 className="font-semibold text-lg truncate">{character.name.replace("_", " ")}</h3>
                                         {selectedCharacter.id === character.id && (
                                             <Badge variant="default" className="text-xs">
-                                                Active
+                                                Aktif
                                             </Badge>
                                         )}
                                     </div>
@@ -81,24 +163,24 @@ export default function KarakterSection() {
                 ))}
             </div>
 
-            <Tabs defaultValue="overview" className="space-y-6">
+            {/* <Tabs defaultValue="overview" className="space-y-6">
                 <TabsList className="grid w-full grid-cols-2">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="activity">Activity</TabsTrigger>
                 </TabsList>
-
-                <TabsContent value="overview" className="space-y-6">
+{/*  */}
+                {/* <TabsContent value="overview" className="space-y-6"> */}
                     <div className="grid gap-3">
                         <Card className="lg:col-span-2">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
                                     <div>
                                         <CardTitle className="text-2xl">{selectedCharacter.name.replace("_", " ")}</CardTitle>
-                                        <CardDescription>Character ID: #{selectedCharacter.id}</CardDescription>
+                                        <CardDescription>ID Karakter: #{selectedCharacter.id}</CardDescription>
                                     </div>
                                     <div className="text-right">
                                         <div className="text-2xl font-bold">Level {selectedCharacter.level}</div>
-                                        <div className="text-sm text-muted-foreground">{selectedCharacter.levelup}% to next level</div>
+                                        <div className="text-sm text-muted-foreground">{selectedCharacter.levelup}% menuju level berikutnya</div>
                                     </div>
                                 </div>
                                 <Progress value={selectedCharacter.levelup} className="mt-2" />
@@ -108,20 +190,20 @@ export default function KarakterSection() {
                                     <div className="space-y-3">
                                         <h4 className="font-medium flex items-center gap-2">
                                             <User className="w-4 h-4" />
-                                            Personal Information
+                                            Informasi Pribadi
                                         </h4>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Full Name:</span>
+                                                <span className="text-muted-foreground">Nama Lengkap:</span>
                                                 <span>{selectedCharacter.name.replace("_", " ")}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Character ID:</span>
+                                                <span className="text-muted-foreground">ID Karakter:</span>
                                                 <span>#{selectedCharacter.id}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-muted-foreground">Vip Status:</span>
-                                                <span>{selectedCharacter.vip ? "Yes" : "No"}</span>
+                                                <span className="text-muted-foreground">Status VIP:</span>
+                                                <span>{selectedCharacter.vip ? "Ya" : "Tidak"}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -129,21 +211,21 @@ export default function KarakterSection() {
                                     <div className="space-y-3">
                                         <h4 className="font-medium flex items-center gap-2">
                                             <Wallet className="w-5 h-5" />
-                                            Financial
+                                            Keuangan
                                         </h4>
                                         <div className="space-y-2 text-sm">
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-muted-foreground">Cash:</span>
-                                                <span >${selectedCharacter.money.toLocaleString()}</span>
+                                                <span className="text-sm text-muted-foreground">Uang Tunai:</span>
+                                                <span >Rp{(selectedCharacter.money ?? 0).toLocaleString()}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
                                                 <span className="text-sm text-muted-foreground">Bank:</span>
-                                                <span >${selectedCharacter.bankmoney.toLocaleString()}</span>
+                                                <span >Rp{(selectedCharacter.bankmoney ?? 0).toLocaleString()}</span>
                                             </div>
                                             <div className="flex justify-between items-center">
-                                                <span className="text-sm text-muted-foreground">Total:</span>
+                                                <span className="font-bold text-green-600">Total:</span>
                                                 <span className="font-bold text-green-600">
-                                                    ${(selectedCharacter.money + selectedCharacter.bankmoney).toLocaleString()}
+                                                    Rp{((selectedCharacter.money ?? 0) + (selectedCharacter.bankmoney ?? 0)).toLocaleString()}
                                                 </span>
                                             </div>
                                         </div>
@@ -154,13 +236,12 @@ export default function KarakterSection() {
                             </CardContent>
                         </Card>
                     </div>
-                </TabsContent>
+                {/* </TabsContent> */}
 
-                <TabsContent value="activity" className="space-y-6">
+                {/* <TabsContent value="activity" className="space-y-6">
                     <Card>
                         <CardHeader>
                             <CardTitle>Recent Activity</CardTitle>
-                            {/* <CardDescription>Your character's recent actions and events</CardDescription> */}
                         </CardHeader>
                         <CardContent>
                             <div className="space-y-4">
@@ -195,8 +276,8 @@ export default function KarakterSection() {
                             </div>
                         </CardContent>
                     </Card>
-                </TabsContent>
-            </Tabs>
+                </TabsContent> */}
+            {/* </Tabs> */}
         </div>
     );
 }

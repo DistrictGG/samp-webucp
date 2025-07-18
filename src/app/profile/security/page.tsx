@@ -11,12 +11,14 @@ import {
   OtpSchema,
   type PhoneSchemaType,
   PhoneSchema,
+  formatPhoneNumber
 } from "~/app/profile/security/components/forms"
 import { ChangePasswordFormInner } from "~/app/profile/security/components/ChangePasswordForm"
 import { CreateInputNumberFrom } from "~/app/profile/security/components/InputNumberFrom"
 import { CreateInputOtpFrom } from "~/app/profile/security/components/OtpNumberFrom"
 
 import { useState } from "react"
+import { useEffect } from "react";
 
 import { Form } from "~/components/ui/form"
 import { toast } from "sonner"
@@ -26,38 +28,61 @@ import { Badge } from "~/components/ui/badge"
 import { Separator } from "~/components/ui/separator"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "~/components/ui/dialog"
 import { CheckCircle, XCircle, Mail, Phone } from "lucide-react"
+import { useRouter } from "next/navigation";
+import { SecurityPageSkeleton } from "~/app/profile/security/components/SecurityPageSkeleton";
 
 export default function SecurityPage() {
-  const { data: session } = useSession()
+  const { data: session } = useSession();
+  const { data: ucpProfile, isLoading: isUcpLoading, refetch } = api.ucp.playerucp.useQuery();
+  const router = useRouter();
 
-  const [openInputNumber, setOpenInputNumber] = useState(false)
-
-  const [openInputOtp, setOpenInputOtp] = useState(false)
+  const [openInputNumber, setOpenInputNumber] = useState(false);
+  const [openInputOtp, setOpenInputOtp] = useState(false);
 
   const passwordform = useForm<ChangePasswordSchemaType>({
     resolver: zodResolver(ChangePasswordSchema),
-  })
-
+  });
   const inputphoneform = useForm<PhoneSchemaType>({
     resolver: zodResolver(PhoneSchema),
-    defaultValues: {
-      phoneNumber: "",
-    }
-  })
-
+    defaultValues: { phoneNumber: "" },
+  });
   const inputotpform = useForm<OtpSchemaType>({
     resolver: zodResolver(OtpSchema),
-    defaultValues: {
-      value: "",
-    }
-  })
+    defaultValues: { value: "" },
+  });
 
-  // Your existing tRPC mutations
+  const [otpExpiry, setOtpExpiry] = useState<Date | null>(null);
+  const [now, setNow] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(new Date()), 1000);
+    const expiryStr = localStorage.getItem('otpExpiry');
+    if (expiryStr) {
+      const expiryDate = new Date(expiryStr);
+      if (expiryDate > new Date()) {
+        setOtpExpiry(expiryDate);
+      } else {
+        setOtpExpiry(null);
+        localStorage.removeItem('otpExpiry');
+      }
+    }
+    return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    if (!isUcpLoading && !ucpProfile) {
+      router.replace("/profile/ucp");
+    }
+  }, [isUcpLoading, ucpProfile, router]);
+
   const { mutate: SendOtp, isPending: isSendOtpPending } = api.ucp.SendOtp.useMutation({
-    onSuccess: () => {
+    onSuccess: async (data) => {
+      setOtpExpiry(new Date(data.expiry));
+      localStorage.setItem('otpExpiry', new Date(data.expiry).toISOString());
       toast.success("OTP berhasil dikirim")
       inputotpform.setValue("value", "")
       inputphoneform.setValue("phoneNumber", "")
+      await refetch();
       setOpenInputOtp(true)
       setOpenInputNumber(false)
     },
@@ -73,6 +98,7 @@ export default function SecurityPage() {
       inputotpform.setValue("value", "")
       setOpenInputNumber(false)
       setOpenInputOtp(false)
+      localStorage.removeItem('otpExpiry');
     },
     onError: (error) => {
       toast.error(error.message)
@@ -91,6 +117,17 @@ export default function SecurityPage() {
     },
   })
 
+  const { mutate: ResendOtp, isPending: isResendOtpPending } = api.ucp.ResendOtp.useMutation({
+    onSuccess: (data) => {
+      setOtpExpiry(new Date(data.expiry));
+      localStorage.setItem('otpExpiry', new Date(data.expiry).toISOString());
+      toast.success("OTP berhasil dikirim ulang");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleChangePassword = (values: ChangePasswordSchemaType) => {
     changePassword(values)
   }
@@ -108,12 +145,17 @@ export default function SecurityPage() {
   }
 
   const handlePhoneSubmit = (values: PhoneSchemaType) => {
-    const otp = Math.floor(100000 + Math.random() * 900000).toString()
-    SendOtp({ target: values.phoneNumber, otp: otp })
+    SendOtp({ target: formatPhoneNumber(values.phoneNumber) });
   }
 
   const handleOtpSubmit = (values: OtpSchemaType) => {
-    VerifyOtp({ otp: values.value.toString() })
+    VerifyOtp({ otp: values.value.toString()})
+  }
+
+  const canResend = otpExpiry && now > otpExpiry;
+
+  if (isUcpLoading) {
+    return <SecurityPageSkeleton />;
   }
 
   return (
@@ -215,24 +257,11 @@ export default function SecurityPage() {
           <div className="w-full space-y-4">
             <h2 className="text-lg sm:text-xl font-semibold">Ubah Password</h2>
             <Form {...passwordform}>
-              <ChangePasswordFormInner onCanghePassword={handleChangePassword} isLoading={isChangePasswordPending} />
+              <ChangePasswordFormInner onChangePassword={handleChangePassword} isLoading={isChangePasswordPending} />
             </Form>
           </div>
         </div>
       </div>
-
-      {/* <PhoneVerificationDialog
-        open={isOpenNumber}
-        onOpenChange={setIsOpenNumber}
-        onPhoneSubmit={handlePhoneSubmit}
-        onOtpSubmit={handleOtpSubmit}
-        isPhoneLoading={isSendOtpPending}
-        isOtpLoading={isVerifyOtpPending}
-        hasPhoneNumber={!!session?.user.number}
-        phoneNumber={session?.user.number ? String(session.user.number) : ""}
-        currentStep={currentStep}
-        setCurrentStep={setCurrentStep}
-      /> */}
 
       <Dialog open={openInputNumber} onOpenChange={setOpenInputNumber}>
         <DialogContent className="sm:max-w-md">
@@ -264,6 +293,27 @@ export default function SecurityPage() {
             <Form {...inputotpform}>
               <CreateInputOtpFrom onInputOtpNumber={handleOtpSubmit} isLoading={isVerifyOtpPending} />
             </Form>
+            <div className="mt-4 flex flex-col items-center">
+              <span className="text-xs text-muted-foreground">
+                Tidak menerima kode?
+                {canResend ? (
+                  <span
+                    className="text-blue-600 cursor-pointer font-semibold ml-1 underline"
+                    onClick={() => {
+                      ResendOtp();
+                    }}
+                    role="button"
+                    tabIndex={0}
+                  >
+                    Kirim Ulang OTP
+                  </span>
+                ) : (
+                  <span className="ml-1 text-muted-foreground">
+                    Kirim ulang OTP dalam {otpExpiry ? Math.max(0, Math.ceil((otpExpiry.getTime() - now.getTime()) / 1000)) : 0} detik
+                  </span>
+                )}
+              </span>
+            </div>
           </DialogHeader>
         </DialogContent>
       </Dialog>
